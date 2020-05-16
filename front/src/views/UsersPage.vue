@@ -2,15 +2,7 @@
     <div class="users">
         <h3>Users:</h3>
         <el-button type="primary" size="large" round @click="showCreateModal">Add user</el-button>
-        <CreateModal
-                v-show="isCreateModalVisible"
-                @close="close"
-        />
-        <EditModal
-                v-show="isEditModalVisible"
-                :userData="edit_row"
-                @close="close"
-        />
+
         <el-table
                 :data="GET_USERS"
                 style="width: 100%">
@@ -24,7 +16,8 @@
             </el-table-column>
             <el-table-column
                     label="Password"
-                    prop="password">
+                    prop="password"
+                    :formatter="formatPassword">
             </el-table-column>
             <el-table-column align="right">
                 <template slot-scope="scope">
@@ -38,16 +31,24 @@
                             @click="handleDelete(scope.$index, scope.row)">Delete
                     </el-button>
                     <router-link :to="{ name: 'projects', params: { id: scope.row.id }}">
-                        <el-button
-                                size="mini"
-                                @click="handleProjects(scope.$index, scope.row)">Projects
-                        </el-button>
+                        <el-button size="mini">Projects</el-button>
                     </router-link>
 
 
                 </template>
             </el-table-column>
         </el-table>
+        <div>
+            <CreateModal
+                    v-show="isCreateModalVisible"
+                    @close="close"
+            />
+            <EditModal
+                    v-show="isEditModalVisible"
+                    :userData="edit_row"
+                    @close="close"
+            />
+        </div>
     </div>
 </template>
 
@@ -107,6 +108,15 @@
             },
             showEditModal() {
                 this.isEditModalVisible = true;
+            },
+            formatPassword: function (row, column, cellValue) {
+                let ret = ''
+                if (cellValue) {
+                    ret = cellValue.split('').map(function () {
+                        return '* ';
+                    })
+                }
+                return ret;
             }
 
         },

@@ -30,7 +30,7 @@
                         <el-form :model="projectData" status-icon :rules="rules" ref="ruleForm" label-width="120px"
                                  class="demo-ruleForm">
                             <el-form-item label="Title" prop="title">
-                                <el-input v-model.trim="projectData.title"></el-input>
+                                <el-input v-model="projectData.title"></el-input>
                             </el-form-item>
                             <el-form-item label="Type" prop="type">
                                 <el-select v-model="projectData.type" placeholder="Select">
@@ -116,10 +116,11 @@
                         {
                             value: 'SIMPLE',
                             label: 'SIMPLE'
-                        }, {
-                        value: 'MODERN',
-                        label: 'MODERN'
-                    }
+                        },
+                        {
+                            value: 'MODERN',
+                            label: 'MODERN'
+                        }
                     ]
             }
                 ;

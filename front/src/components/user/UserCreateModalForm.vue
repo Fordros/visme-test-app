@@ -27,9 +27,10 @@
                         id="modalDescription"
                 >
                     <slot name="body">
-                        <el-form :model="ruleForm" status-icon :rules="rules" ref="ruleForm" label-width="120px" class="demo-ruleForm">
+                        <el-form :model="ruleForm" status-icon :rules="rules" ref="ruleForm" label-width="120px"
+                                 class="demo-ruleForm">
                             <el-form-item label="Name" prop="name">
-                                <el-input v-model.trim="ruleForm.name"></el-input>
+                                <el-input v-model="ruleForm.name"></el-input>
                             </el-form-item>
                             <el-form-item label="Email" prop="email">
                                 <el-input v-model="ruleForm.email" type="checkEmail"></el-input>
@@ -53,19 +54,21 @@
 </template>
 
 <script>
-    import { mapGetters, mapActions } from 'vuex'
+    import {mapGetters, mapActions} from 'vuex'
+    import {validEmail} from "../../utils/validate";
+
     export default {
         name: 'modal',
         props: {
             edit_data: {
                 type: Object,
-                default(){
+                default() {
                     return {}
                 }
             }
         },
         computed: {
-        ...mapGetters(['GET_USERS'])
+            ...mapGetters(['GET_USERS'])
         },
         methods: {
             ...mapActions(['createUser']),
@@ -76,6 +79,7 @@
             submitForm(formName) {
                 let that = this
                 this.$refs[formName].validate((valid) => {
+                    console.log('create project' + JSON.stringify(this.ruleForm));
                     if (valid) {
                         that.createUser(JSON.stringify(this.ruleForm))
                         that.close();
@@ -92,22 +96,14 @@
         },
 
         data() {
-            var checkName = (rule, value, callback) => {
-                if (value === '') {
-                    callback(new Error('Please input the name'));
-                } else {
-                    if (this.ruleForm.checkName !== '') {
-                        this.$refs.ruleForm.validateField('checkName');
-                    }
-                    callback();
-                }
-            };
             var checkEmail = (rule, value, callback) => {
                 if (!value) {
                     return callback(new Error('Please input the email'));
-                }else {
-                    if (this.ruleForm.checkEmail !== '') {
+                } else {
+                    if (validEmail(this.ruleForm.email)) {
                         this.$refs.ruleForm.validateField('checkEmail');
+                    } else {
+                        callback(new Error('Invalid email!'));
                     }
                     callback();
                 }
@@ -136,30 +132,51 @@
                     'name': '',
                     'email': '',
                     'password': '',
-                    'checkPass':''
+                    'checkPass': ''
                 },
                 rules: {
 
                     name: [
-                        { required: true, min: 2, message: 'Please input the name', validator: checkName, trigger: 'blur' }
+                        {
+                            required: true,
+                            min: 2,
+                            trigger: 'blur'
+                        }
                     ],
                     email: [
-                        { required: true, min: 4, message: 'Please input the email', validator: checkEmail, trigger: 'blur' }
+                        {
+                            required: true,
+                            validator: checkEmail,
+                            trigger: 'blur'
+                        }
                     ],
                     pass: [
-                        { required: true, message: 'Please input the password', validator: validatePass, trigger: 'blur' }
+                        {
+                            required: true,
+                            message: 'Please input the password',
+                            validator: validatePass,
+                            trigger: 'blur'
+                        }
                     ],
                     checkPass: [
-                        { required: true, message: 'Please input the same password', validator: validatePass2, trigger: 'blur' }
+                        {
+                            required: true,
+                            message: 'Please input the same password',
+                            validator: validatePass2,
+                            trigger: 'blur'
+                        }
                     ]
                 }
             };
-        },
-    };
+        }
+        ,
+    }
+    ;
 </script>
 
 <style>
     @import url("//unpkg.com/element-ui@2.13.1/lib/theme-chalk/index.css");
+
     .modal-backdrop {
         position: fixed;
         top: 0;

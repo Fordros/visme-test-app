@@ -29,7 +29,7 @@
                     <slot name="body">
                         <el-form :model="userData"  status-icon :rules="rules" ref="ruleForm" label-width="120px" class="demo-editUser">
                             <el-form-item label="Name" prop="name">
-                                <el-input v-model.trim="userData.name"></el-input>
+                                <el-input v-model="userData.name"></el-input>
                             </el-form-item>
                             <el-form-item label="Email" prop="email">
                                 <el-input v-model.trim="userData.email" type="email"></el-input>
@@ -54,6 +54,7 @@
 
 <script>
     import { mapGetters, mapActions } from 'vuex'
+    import {validEmail} from "../../utils/validate";
     export default {
         name: 'modal',
         props: {
@@ -75,7 +76,7 @@
                 this.$emit('close');
             },
             editForm(formName) {
-                console.log("editing user" + this.userData)
+                console.log("editing user" + JSON.stringify(this.userData))
                 let that = this
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
@@ -96,22 +97,14 @@
             }
         },
         data() {
-            var checkName = (rule, value, callback) => {
-                if (value === '') {
-                    callback(new Error('Please input the name'));
-                } else {
-                    if (this.userData.checkName !== '') {
-                        this.$refs.ruleForm.validateField('checkName');
-                    }
-                    callback();
-                }
-            };
             var checkEmail = (rule, value, callback) => {
-                if (value === '') {
+                if (!value) {
                     return callback(new Error('Please input the email'));
-                }else {
-                    if (this.userData.checkEmail !== '') {
+                } else {
+                    if (validEmail(this.userData.email)) {
                         this.$refs.ruleForm.validateField('checkEmail');
+                    } else {
+                        callback(new Error('Invalid email!'));
                     }
                     callback();
                 }
@@ -145,16 +138,34 @@
                 rules: {
 
                     name: [
-                        { required: true, message: 'Please input the name', validator: checkName, trigger: 'blur' }
+                        {
+                            required: true,
+                            min: 2,
+                            trigger: 'blur'
+                        }
                     ],
                     email: [
-                        { required: true, message: 'Please input the email', validator: checkEmail, trigger: 'blur' }
+                        {
+                            required: true,
+                            validator: checkEmail,
+                            trigger: 'blur'
+                        }
                     ],
                     pass: [
-                        { required: true, message: 'Please input the password', validator: validatePass, trigger: 'blur' }
+                        {
+                            required: true,
+                            message: 'Please input the password',
+                            validator: validatePass,
+                            trigger: 'blur'
+                        }
                     ],
                     checkPass: [
-                        { required: true, message: 'Please input the same password', validator: validatePass2, trigger: 'blur' }
+                        {
+                            required: true,
+                            message: 'Please input the same password',
+                            validator: validatePass2,
+                            trigger: 'blur'
+                        }
                     ]
                 }
             };

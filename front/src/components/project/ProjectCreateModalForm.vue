@@ -30,7 +30,7 @@
                         <el-form :model="ruleForm" status-icon :rules="rules" ref="ruleForm" label-width="120px"
                                  class="demo-ruleForm">
                             <el-form-item label="Title" prop="title">
-                                <el-input v-model.trim="ruleForm.title"></el-input>
+                                <el-input v-model="ruleForm.title"></el-input>
                             </el-form-item>
                             <el-form-item label="Type" prop="type">
                                 <el-select v-model="ruleForm.type" placeholder="Select">
@@ -79,8 +79,8 @@
             submitForm(formName) {
                 let that = this
                 this.$refs[formName].validate((valid) => {
+                    console.log('create project' + JSON.stringify(this.ruleForm));
                     if (valid) {
-                        console.log('create project' + JSON.stringify(this.ruleForm));
                         that.createProject(this.ruleForm)
                         that.resetForm('ruleForm');
                         that.close();

@@ -2,17 +2,7 @@
     <div class="projects">
         <h3>Projects:</h3>
         <el-button type="primary" size="large" round @click="showCreateModal">Add project</el-button>
-        <CreateModal
-                v-show="isCreateModalVisible"
-                :projectData="projectData"
-                @close="close"
-        />
-        <EditModal
-                v-show="isEditModalVisible"
-                :projectData="projectData"
-                @close="close"
-        />
-
+        <router-link to="/users"><el-button type="primary" size="large" round>Users</el-button></router-link>
         <el-table
                 :data="GET_PROJECTS"
                 style="width: 100%">
@@ -31,49 +21,68 @@
             </el-table-column>
             <el-table-column
                     label="Created at"
-                    prop="createdAt">
+                    prop="createdAt"
+                    :formatter="formatTimestamp">
             </el-table-column>
             <el-table-column
                     label="Modified at"
-                    prop='modifiedAt'>
+                    prop='modifiedAt'
+                    :formatter="formatTimestamp">
             </el-table-column>
             <el-table-column align="right">
                 <template slot-scope="scope">
                     <el-button
                             size="mini"
-                            @click="handleEdit(scope.$index, scope.row)">Edit</el-button>
+                            @click="handleEdit(scope.$index, scope.row)">Edit
+                    </el-button>
                     <el-button
                             size="mini"
                             type="danger"
-                            @click="handleDelete(scope.$index, scope.row)">Delete</el-button>
+                            @click="handleDelete(scope.$index, scope.row)">Delete
+                    </el-button>
                     <el-button
                             size="mini"
-                            @click="handleAccessTime(scope.$index, scope.row)">Access time</el-button>
+                            @click="handleAccessTime(scope.$index, scope.row)">Access time
+                    </el-button>
 
                 </template>
             </el-table-column>
         </el-table>
-        <ProjectAccess
-                v-show="isDialogTableVisible"
+        <CreateModal
+                v-show="isCreateModalVisible"
+                :projectData="projectData"
                 @close="close"
         />
+        <EditModal
+                v-show="isEditModalVisible"
+                :projectData="projectData"
+                @close="close"
+        />
+        <div>
+            <el-dialog title="Accesses" :visible.sync="isDialogTableVisible">
+                <el-table :data="GET_ACCESSES">
+                    <el-table-column property="id" label="Project ID" width="150"></el-table-column>
+                    <el-table-column property="time" label="Date" width="200" :formatter="formatTimestamp"></el-table-column>
+                </el-table>
+            </el-dialog>
+        </div>
     </div>
+
 </template>
 
 <script>
     import CreateModal from "../components/project/ProjectCreateModalForm";
     import EditModal from "../components/project/ProjectEditModalForm";
-    import ProjectAccess from "../components/project/ProjectAccess";
-    import { mapGetters, mapActions } from 'vuex'
+    import moment from 'moment'
+    import {mapGetters, mapActions} from 'vuex'
 
     export default {
         components: {
-            ProjectAccess,
             CreateModal,
             EditModal
         },
         props: {
-            userId:Number
+            userId: Number
         },
         data() {
             return {
@@ -81,18 +90,14 @@
                 isEditModalVisible: false,
                 isDialogTableVisible: false,
                 projectData: {
-                    id:'',
-                    userId:'',
-                    title:'',
-                    type:'',
-                    favorite:'',
-                    created:'',
-                    modified:''
-                },
-                accesses:[{
-                    title:'test',
-                    times:[1234]
-                }]
+                    id: '',
+                    userId: '',
+                    title: '',
+                    type: '',
+                    favorite: '',
+                    created: '',
+                    modified: ''
+                }
             }
         },
         computed: {
@@ -100,15 +105,7 @@
         },
         methods: {
             ...mapActions(['loadAllForUser', "removeProject", 'loadAllAccessTimes']),
-            formatBoolean: function (row, column, cellValue) {
-                var ret = '' //The value you want to display on the page
-                if (cellValue) {
-                    ret = "Yes" //Set according to your needs
-                } else {
-                    ret = "no"
-                }
-                return ret;
-            },
+
             handleEdit(index, row) {
                 let that = this
                 console.log("edit project " + row.id);
@@ -128,16 +125,9 @@
             }
             ,
             handleAccessTime(index, row) {
-
                 var projectId = row.id
-                console.log("get access times for project " + projectId);
                 this.loadAllAccessTimes(projectId)
-
-                JSON.stringify(this.GET_ACCESSES)
-
-                this.$alert(this.GET_ACCESSES, 'Access times', {
-                    confirmButtonText: 'OK',
-                });
+                this.isDialogTableVisible = true;
             },
             showCreateModal() {
                 this.isCreateModalVisible = true;
@@ -149,7 +139,23 @@
             },
             showEditModal() {
                 this.isEditModalVisible = true;
-            }
+            },
+            formatBoolean: function (row, column, cellValue) {
+                var ret = '' //The value you want to display on the page
+                if (cellValue) {
+                    ret = "Yes" //Set according to your needs
+                } else {
+                    ret = "no"
+                }
+                return ret;
+            },
+            formatTimestamp: function (row, column, cellValue) {
+                var ret = '' //The value you want to display on the page
+                if (cellValue) {
+                    ret = moment(cellValue).utc().format('DD-MM-YYYY HH:mm:ss'); //Set according to your needs
+                }
+                return ret;
+            },
 
         },
         mounted() {

@@ -1,5 +1,4 @@
 import axios from 'axios'
-// import { getToken, removeToken } from '../utils/auth'
 
 axios.defaults.withCredentials = false
 
@@ -9,10 +8,6 @@ const service = axios.create({
 
 service.interceptors.request.use(
   config => {
-    // let sessionId = getToken()
-    // if (sessionId) {
-    //   config.headers.Authorization = `JSESSIONID=${sessionId}`
-    // }
     config.headers.HTTP2_HEADER_CONTENT_TYPE = 'application/json'
          return config
   },
@@ -27,12 +22,7 @@ service.interceptors.response.use(
   },
   error => {
     if (error.response) {
-      switch (error.response.status) {
-        case 401:
-        case 403:
-          // removeToken()
-          window.location.href = 'http://localhost:8080/login'
-      }
+      console.log(error.response)
     }
     return Promise.reject(error.response.data)
   }

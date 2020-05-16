@@ -11,7 +11,8 @@ const mutations = {
         state.users.push(user)
     },
     REMOVE_USER(state, userId) {
-        state.users.splice(userId, 1)
+        let index = state.users.findIndex(item => item.id === userId)
+        state.users.splice(index, 1)
     },
     EDIT_USER(state, user) {
         const item = state.users.find(item => item.id === user.id);
@@ -36,13 +37,12 @@ const actions = {
     },
     removeUser ({commit}, userId) {
         remove(userId).then(r => {
-            commit('REMOVE_USER', r)
+            commit('REMOVE_USER', userId)
         }).catch( error =>{
             console.log(error);
         })
     },
     editUser ({commit}, user) {
-        console.log("api request for edit " + user.id)
     edit(user).then(r => {
         commit('EDIT_USER', r)
     }).catch( error =>{

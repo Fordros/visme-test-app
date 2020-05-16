@@ -19,9 +19,8 @@ const mutations = {
         state.projects.push(item)
     },
     REMOVE_PROJECT(state, itemId) {
-        const item = state.projects.find(item => item.id === itemId);
-        console.log('found item id' + item.id)
-        state.projects.splice(item.index, 1)
+        let index = state.projects.findIndex(item => item.id === itemId)
+        state.projects.splice(index, 1)
     },
     EDIT_PROJECT(state, project) {
         const item = state.projects.find(item => item.id === project.id);
@@ -46,7 +45,6 @@ const actions = {
         })
     },
     createProject({commit}, project) {
-        console.log('store before create' + JSON.stringify(project));
         create(project).then(r => {
             commit('PUSH_PROJECT', r)
         }).catch(error => {
@@ -55,7 +53,6 @@ const actions = {
     },
     removeProject({commit}, projectId) {
         remove(projectId).then(() => {
-            console.log("remove project" + projectId);
             commit('REMOVE_PROJECT', projectId)
         }).catch(error => {
             console.log(error);
@@ -69,7 +66,6 @@ const actions = {
         })
     },
     changeFavoriteState({commit}, projectId) {
-        console.log("api request for edit " + projectId)
         changeFavoriteState(projectId).then(r => {
             console.log(r);
             commit('EDIT_FAVORITE_STATE', projectId)
@@ -77,11 +73,13 @@ const actions = {
             console.log(error);
         })
     },
-    loadAllAccessTimes( {commit}, projectId) {
-        console.log("store " + JSON.stringify(projectId));
+    loadAllAccessTimes({commit}, projectId) {
         return getAccessTimesByProjectId(projectId).then(r => {
-            commit('SET_ACCESSES', r)
-            console.log("store return" + JSON.stringify(r));
+
+            var accesses = r.map(function (time) {
+                return {id: projectId, time: time};
+            });
+            commit('SET_ACCESSES', accesses)
             return r;
         }).catch(error => {
             console.log(error);
